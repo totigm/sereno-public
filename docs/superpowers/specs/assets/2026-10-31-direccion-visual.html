@@ -1,0 +1,424 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Instrument+Sans:wght@400..700&display=swap" rel="stylesheet">
+<style>
+  .cards.dirs { grid-template-columns: 1fr; gap: 1.75rem; }
+  .dirs .card { padding: 1.25rem; }
+  .dirs .card:hover { transform: none; }
+  .dir-head { display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 1rem; }
+  .dir-letter { background: var(--bg-tertiary); color: var(--text-secondary); width: 1.9rem; height: 1.9rem; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 600; flex-shrink: 0; }
+  .card.selected .dir-letter { background: var(--accent); color: #fff; }
+  .dir-head h3 { margin: 0 0 .2rem; }
+  .dir-head p { color: var(--text-secondary); font-size: .9rem; margin: 0; max-width: 78ch; }
+  .frames { display: flex; gap: 1.25rem; align-items: flex-start; flex-wrap: wrap; }
+  .fd { width: 760px; max-width: 100%; border-radius: 12px; overflow: hidden; box-shadow: 0 12px 32px rgba(0,0,0,.2); font-size: 11px; line-height: 1.35; }
+  .fp { width: 250px; height: 540px; border-radius: 30px; overflow: hidden; border: 6px solid #15161a; box-shadow: 0 12px 32px rgba(0,0,0,.25); font-size: 11px; line-height: 1.35; position: relative; flex-shrink: 0; }
+  .fd *, .fp * { box-sizing: border-box; }
+  .fd h4, .fp h4 { margin: 0; }
+
+  /* ===== A · Tablero ===== */
+  .a { font-family: 'Archivo', system-ui, sans-serif; background: #0B1020; color: #E7EBF3; font-variant-numeric: tabular-nums; }
+  .a .up { color: #4FD1A5; } .a .dn { color: #FF7A7A; }
+  .a-top { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid #1B2440; }
+  .a-brand { font-weight: 700; font-size: 12px; letter-spacing: -.01em; }
+  .a-brand span { font-weight: 400; color: #7C8599; margin-left: 8px; }
+  .a-brand span::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #4FD1A5; margin-right: 5px; vertical-align: 1px; }
+  .a-nav { display: flex; gap: 14px; color: #7C8599; }
+  .a-nav b { color: #E7EBF3; font-weight: 600; }
+  .a-strip { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1.7fr; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #1B2440; }
+  .a-k { color: #7C8599; font-size: 10px; margin-bottom: 2px; }
+  .a-v { font-size: 19px; font-weight: 600; letter-spacing: -.02em; line-height: 1.1; }
+  .a-v small { font-size: 10px; font-weight: 500; margin-left: 5px; }
+  .a-prot { display: flex; flex-direction: column; justify-content: center; }
+  .a-prot .a-k { margin-bottom: 0; }
+  .a-prot .t { font-size: 10px; color: #A9B1C3; margin-top: 1px; }
+  .a-bar { height: 6px; background: #1B2440; border-radius: 3px; overflow: hidden; margin-top: 5px; }
+  .a-bar i { display: block; height: 100%; width: 35%; background: #4FD1A5; border-radius: 3px; }
+  .a-body { display: grid; grid-template-columns: 1fr 224px; }
+  .a-board { padding: 12px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; align-content: start; }
+  .a-tile { background: #121A2E; border: 1px solid #1B2440; border-radius: 8px; padding: 7px 8px; }
+  .a-tile.pos-l { border-color: rgba(79,209,165,.7); box-shadow: inset 0 0 0 1px rgba(79,209,165,.25); }
+  .a-tile.pos-s { border-color: rgba(255,122,122,.7); box-shadow: inset 0 0 0 1px rgba(255,122,122,.25); }
+  .a-tile .r { display: flex; justify-content: space-between; align-items: baseline; gap: 4px; }
+  .a-tile .s { font-weight: 700; font-size: 11px; font-stretch: 90%; }
+  .a-tile .c { font-size: 10px; }
+  .a-lean { position: relative; height: 4px; background: #1B2440; border-radius: 2px; margin-top: 7px; }
+  .a-lean::after { content: ''; position: absolute; left: 50%; top: -2px; width: 1px; height: 8px; background: #2E3A5E; }
+  .a-lean i { position: absolute; top: 0; height: 100%; border-radius: 2px; opacity: .55; }
+  .a-lean i.l { background: #4FD1A5; } .a-lean i.s { background: #FF7A7A; }
+  .a-tile.hot .a-lean i, .a-tile.pos-l .a-lean i, .a-tile.pos-s .a-lean i { opacity: 1; }
+  .a-chip { font-size: 9px; padding: 1px 5px; border-radius: 4px; font-weight: 700; }
+  .a-chip.l { background: rgba(79,209,165,.16); color: #4FD1A5; }
+  .a-chip.s { background: rgba(255,122,122,.16); color: #FF7A7A; }
+  .a-rail { border-left: 1px solid #1B2440; padding: 12px; }
+  .a-rail h4 { font-size: 11px; font-weight: 600; margin: 0 0 6px; }
+  .a-rail h4 + .a-row { border-top: 1px solid #1B2440; }
+  .a-row { display: grid; grid-template-columns: 1fr auto; gap: 6px; padding: 7px 0; border-bottom: 1px solid #1B2440; }
+  .a-row .n { font-weight: 600; } .a-row .m { color: #7C8599; font-size: 10px; }
+  .a-row .p { text-align: right; font-weight: 600; } .a-row .p small { display: block; font-weight: 400; font-size: 10px; }
+  .a-log { color: #A9B1C3; font-size: 10px; margin-top: 7px; line-height: 1.45; }
+  .a-log time { color: #7C8599; margin-right: 4px; }
+
+  .ap { font-family: 'Archivo', system-ui, sans-serif; background: #0B1020; color: #E7EBF3; font-variant-numeric: tabular-nums; display: flex; flex-direction: column; height: 100%; }
+  .ap .up { color: #4FD1A5; } .ap .dn { color: #FF7A7A; }
+  .ap-status { display: flex; justify-content: space-between; padding: 9px 16px 0; font-size: 10px; color: #A9B1C3; font-weight: 600; }
+  .ap-hero { padding: 12px 14px 8px; }
+  .ap-hero .k { color: #7C8599; font-size: 10px; }
+  .ap-hero .v { font-size: 27px; font-weight: 600; letter-spacing: -.03em; line-height: 1.1; }
+  .ap-sub { display: flex; gap: 10px; font-size: 10px; margin-top: 4px; color: #A9B1C3; }
+  .ap-prot { margin: 6px 14px 0; font-size: 10px; color: #A9B1C3; }
+  .ap-board { padding: 8px 10px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; flex: 1; overflow: hidden; align-content: start; }
+  .ap-board .a-tile { padding: 6px 7px; }
+  .ap-tabs { display: flex; justify-content: space-around; padding: 9px 6px 12px; border-top: 1px solid #1B2440; background: #0B1020; font-size: 9px; color: #7C8599; }
+  .ap-tabs b { color: #E7EBF3; font-weight: 600; }
+
+  /* ===== B · Libreta ===== */
+  .b { font-family: 'Instrument Sans', system-ui, sans-serif; background: #EDF0F4; color: #17202A; font-variant-numeric: tabular-nums; }
+  .b .up { color: #2E8B6A; } .b .dn { color: #C4553D; }
+  .b-top { display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; color: #6B7482; }
+  .b-top b { color: #17202A; font-weight: 600; }
+  .b-top .nav { display: flex; gap: 14px; }
+  .b-top .nav b { font-weight: 600; }
+  .b-wrap { max-width: 560px; margin: 0 auto; padding: 14px 24px 22px; }
+  .b-hero { font-size: 24px; line-height: 1.2; letter-spacing: -.02em; font-weight: 500; max-width: 24ch; }
+  .b-hero em { font-style: normal; font-weight: 700; }
+  .b-sub { color: #6B7482; margin-top: 6px; }
+  .b-chart { margin: 14px 0 4px; background: #fff; border: 1px solid #DFE3E8; border-radius: 14px; padding: 10px 10px 6px; }
+  .b-chart .lg { display: flex; justify-content: space-between; color: #6B7482; font-size: 10px; margin-top: 2px; }
+  .b-cols { display: grid; grid-template-columns: 1.3fr 1fr; gap: 18px; margin-top: 14px; }
+  .b-sec h4 { font-size: 11px; font-weight: 600; margin: 0 0 4px; }
+  .b-row { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid #DFE3E8; }
+  .b-rows .b-row:last-child { border-bottom: 1px solid #DFE3E8; }
+  .b-coin b { font-weight: 600; } .b-coin span { color: #6B7482; margin-left: 6px; }
+  .b-pill { font-size: 10px; padding: 2px 7px; border-radius: 999px; background: #E1EEE8; color: #2E8B6A; font-weight: 600; }
+  .b-pill.s { background: #F5E5E1; color: #C4553D; }
+  .b-pnl { font-weight: 600; text-align: right; }
+  .b-cap { background: #fff; border: 1px solid #DFE3E8; border-radius: 14px; padding: 12px; }
+  .b-cap p { margin: 0; line-height: 1.4; }
+  .b-cap .m { color: #6B7482; font-size: 10px; margin-top: 4px; }
+  .b-bar { height: 8px; background: #E6EAF0; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+  .b-bar i { display: block; height: 100%; width: 35%; background: #2E8B6A; }
+  .b-journal { margin-top: 14px; }
+  .b-journal p { margin: 0; padding: 7px 0; border-top: 1px solid #DFE3E8; line-height: 1.4; }
+  .b-journal time { color: #6B7482; margin-right: 6px; }
+
+  .bp { font-family: 'Instrument Sans', system-ui, sans-serif; background: #EDF0F4; color: #17202A; font-variant-numeric: tabular-nums; display: flex; flex-direction: column; height: 100%; }
+  .bp .up { color: #2E8B6A; } .bp .dn { color: #C4553D; }
+  .bp-status { display: flex; justify-content: space-between; padding: 9px 16px 0; font-size: 10px; color: #17202A; font-weight: 600; }
+  .bp-wrap { padding: 14px 14px 0; flex: 1; overflow: hidden; }
+  .bp-wrap .b-hero { font-size: 21px; }
+  .bp-wrap .b-chart { margin: 12px 0 4px; }
+  .bp-tabs { display: flex; justify-content: space-around; padding: 9px 6px 12px; border-top: 1px solid #DFE3E8; background: #fff; font-size: 9px; color: #6B7482; }
+  .bp-tabs b { color: #17202A; font-weight: 600; }
+
+  /* ===== C · Cristal ===== */
+  .c { font-family: system-ui, -apple-system, 'SF Pro Text', sans-serif; background: radial-gradient(120% 95% at 15% 0%, #2B306F 0%, #171B3D 42%, #0B2F34 100%); color: #fff; font-variant-numeric: tabular-nums; }
+  .c .up { color: #5EEAD4; } .c .dn { color: #FB7185; }
+  .c-top { display: flex; justify-content: space-between; align-items: center; padding: 9px 18px; background: rgba(255,255,255,.06); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,.1); }
+  .c-top .brand { font-weight: 600; letter-spacing: -.01em; }
+  .c-top .brand span { color: rgba(255,255,255,.6); font-weight: 400; margin-left: 8px; }
+  .c-seg { display: flex; background: rgba(255,255,255,.08); border-radius: 999px; padding: 3px; }
+  .c-seg span { padding: 4px 10px; border-radius: 999px; color: rgba(255,255,255,.65); }
+  .c-seg b { padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.18); font-weight: 600; }
+  .c-grid { display: grid; grid-template-columns: 1.25fr 1fr; gap: 12px; padding: 14px 18px 10px; }
+  .glass { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); border-top-color: rgba(255,255,255,.24); border-radius: 20px; backdrop-filter: blur(24px); box-shadow: 0 14px 34px rgba(0,0,0,.28); padding: 14px; }
+  .c-k { color: rgba(255,255,255,.62); font-size: 10px; }
+  .c-big { font-size: 30px; font-weight: 600; letter-spacing: -.03em; line-height: 1.1; }
+  .c-meta { display: flex; gap: 12px; margin-top: 4px; font-size: 10px; color: rgba(255,255,255,.8); }
+  .c-prot { margin-top: 10px; font-size: 10px; color: rgba(255,255,255,.75); }
+  .c-prot .bar { height: 6px; background: rgba(255,255,255,.12); border-radius: 3px; margin-top: 5px; overflow: hidden; }
+  .c-prot .bar i { display: block; height: 100%; width: 35%; background: #5EEAD4; border-radius: 3px; box-shadow: 0 0 10px rgba(94,234,212,.6); }
+  .c-pos { display: flex; flex-direction: column; gap: 8px; }
+  .c-card { padding: 10px 12px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; }
+  .c-card .n { font-weight: 600; } .c-card .m { color: rgba(255,255,255,.62); font-size: 10px; }
+  .c-card .p { text-align: right; font-weight: 600; } .c-card .p small { display: block; font-weight: 400; font-size: 10px; color: rgba(255,255,255,.62); }
+  .c-list { padding: 0 18px 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .c-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 11px; border-radius: 12px; }
+  .c-item b { font-weight: 600; } .c-item .ch { font-size: 10px; margin-left: 6px; }
+  .c-pill { font-size: 9px; padding: 2px 7px; border-radius: 999px; font-weight: 600; }
+  .c-pill.l { background: rgba(94,234,212,.18); color: #5EEAD4; }
+  .c-pill.s { background: rgba(251,113,133,.18); color: #FB7185; }
+  .c-pill.n { background: rgba(255,255,255,.1); color: rgba(255,255,255,.65); }
+
+  .cp { font-family: system-ui, -apple-system, 'SF Pro Text', sans-serif; background: radial-gradient(130% 70% at 20% 0%, #2B306F 0%, #171B3D 45%, #0B2F34 100%); color: #fff; font-variant-numeric: tabular-nums; display: flex; flex-direction: column; height: 100%; }
+  .cp .up { color: #5EEAD4; } .cp .dn { color: #FB7185; }
+  .cp-status { display: flex; justify-content: space-between; padding: 9px 16px 0; font-size: 10px; font-weight: 600; }
+  .cp-wrap { padding: 12px 12px 0; flex: 1; overflow: hidden; }
+  .cp-wrap .c-big { font-size: 28px; }
+  .cp-h { display: flex; justify-content: space-between; align-items: baseline; margin: 12px 2px 6px; }
+  .cp-h h4 { font-size: 11px; font-weight: 600; } .cp-h span { font-size: 10px; color: rgba(255,255,255,.6); }
+  .cp-scroll { display: flex; gap: 8px; overflow: hidden; }
+  .cp-scroll .c-card { flex: 0 0 150px; flex-direction: column; align-items: flex-start; gap: 6px; }
+  .cp-scroll .c-card .p { text-align: left; }
+  .cp-list { display: flex; flex-direction: column; gap: 6px; }
+  .cp-tabs { display: flex; justify-content: space-around; padding: 9px 6px 12px; background: rgba(255,255,255,.07); backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,.12); font-size: 9px; color: rgba(255,255,255,.6); }
+  .cp-tabs b { color: #fff; font-weight: 600; }
+</style>
+
+<h2>¿Qué dirección se siente bien para el dashboard?</h2>
+<p class="subtitle">Tres caminos distintos, cada uno con su pantalla principal en desktop y en el celu. Son bocetos estáticos con datos de ejemplo; lo fluido (springs, gestos, transiciones) lo sumamos después sobre la que elijas. Hacé clic en una para seleccionarla y después contame en la terminal qué le robarías a las otras.</p>
+
+<div class="cards dirs">
+
+  <!-- ============ A · TABLERO ============ -->
+  <div class="card" data-choice="tablero" onclick="toggleSelect(this)">
+    <div class="dir-head">
+      <div class="dir-letter">A</div>
+      <div>
+        <h3>Tablero</h3>
+        <p>El protagonista es el tablero con las 30 monedas: cada baldosa muestra hacia dónde se inclina el bot (barra de short a long) y resalta las que tiene abiertas. De un vistazo ves todo el mercado y dónde está parado. Oscuro, denso, para mirar de noche. Tipografía Archivo.</p>
+      </div>
+    </div>
+    <div class="frames">
+      <div class="fd a">
+        <div class="a-top">
+          <div class="a-brand">Trading bot <span>simulado · en vivo</span></div>
+          <div class="a-nav"><b>Tablero</b><span>Posiciones</span><span>Monedas</span><span>Aprendizaje</span><span>Ajustes</span></div>
+        </div>
+        <div class="a-strip">
+          <div><div class="a-k">Balance</div><div class="a-v">$1.247,80 <small class="up">+24,8%</small></div></div>
+          <div><div class="a-k">Hoy</div><div class="a-v up">+$38,20 <small>+3,2%</small></div></div>
+          <div><div class="a-k">Trades ganados</div><div class="a-v">14 <small style="color:#7C8599">de 23</small></div></div>
+          <div class="a-prot"><div class="a-k">Protección del capital</div><div class="t">Faltan $452 para blindar los $1.000 iniciales</div><div class="a-bar"><i></i></div></div>
+        </div>
+        <div class="a-body">
+          <div class="a-board">
+            <div class="a-tile"><div class="r"><span class="s">BTC</span><span class="c up">+1,2%</span></div><div class="a-lean"><i class="l" style="left:50%;width:17.5%"></i></div></div>
+            <div class="a-tile pos-s"><div class="r"><span class="s">ETH</span><span class="a-chip s">S 3x</span></div><div class="a-lean"><i class="s" style="left:30%;width:20%"></i></div></div>
+            <div class="a-tile pos-l"><div class="r"><span class="s">SOL</span><span class="a-chip l">L 5x</span></div><div class="a-lean"><i class="l" style="left:50%;width:36%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">BNB</span><span class="c up">+0,4%</span></div><div class="a-lean"><i class="l" style="left:50%;width:5%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">XRP</span><span class="c dn">−1,5%</span></div><div class="a-lean"><i class="s" style="left:39%;width:11%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">DOGE</span><span class="c up">+2,3%</span></div><div class="a-lean"><i class="l" style="left:50%;width:9%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">ADA</span><span class="c dn">−0,6%</span></div><div class="a-lean"><i class="s" style="left:46%;width:4%"></i></div></div>
+            <div class="a-tile pos-l"><div class="r"><span class="s">AVAX</span><span class="a-chip l">L 2x</span></div><div class="a-lean"><i class="l" style="left:50%;width:27.5%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">LINK</span><span class="c up">+1,9%</span></div><div class="a-lean"><i class="l" style="left:50%;width:15%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">DOT</span><span class="c dn">−0,2%</span></div><div class="a-lean"><i class="s" style="left:47.5%;width:2.5%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">POL</span><span class="c up">+0,9%</span></div><div class="a-lean"><i class="l" style="left:50%;width:6%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">LTC</span><span class="c dn">−1,1%</span></div><div class="a-lean"><i class="s" style="left:36%;width:14%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">ATOM</span><span class="c up">+0,3%</span></div><div class="a-lean"></div></div>
+            <div class="a-tile"><div class="r"><span class="s">NEAR</span><span class="c up">+3,4%</span></div><div class="a-lean"><i class="l" style="left:50%;width:24%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">APT</span><span class="c dn">−2,2%</span></div><div class="a-lean"><i class="s" style="left:27.5%;width:22.5%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">ARB</span><span class="c up">+1,0%</span></div><div class="a-lean"><i class="l" style="left:50%;width:10%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">OP</span><span class="c up">+0,7%</span></div><div class="a-lean"><i class="l" style="left:50%;width:7.5%"></i></div></div>
+            <div class="a-tile hot"><div class="r"><span class="s">SUI</span><span class="c up">+5,2%</span></div><div class="a-lean"><i class="l" style="left:50%;width:30%"></i></div></div>
+            <div class="a-tile hot"><div class="r"><span class="s">INJ</span><span class="c dn">−3,0%</span></div><div class="a-lean"><i class="s" style="left:24%;width:26%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">TIA</span><span class="c dn">−1,8%</span></div><div class="a-lean"><i class="s" style="left:32.5%;width:17.5%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">SEI</span><span class="c up">+0,2%</span></div><div class="a-lean"><i class="l" style="left:50%;width:2%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">FIL</span><span class="c dn">−0,4%</span></div><div class="a-lean"><i class="s" style="left:44%;width:6%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">UNI</span><span class="c up">+1,4%</span></div><div class="a-lean"><i class="l" style="left:50%;width:12.5%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">AAVE</span><span class="c up">+2,1%</span></div><div class="a-lean"><i class="l" style="left:50%;width:19%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">RENDER</span><span class="c up">+0,6%</span></div><div class="a-lean"><i class="l" style="left:50%;width:4.5%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">FET</span><span class="c dn">−2,6%</span></div><div class="a-lean"><i class="s" style="left:29%;width:21%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">TON</span><span class="c up">+0,1%</span></div><div class="a-lean"><i class="s" style="left:49%;width:1%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">WIF</span><span class="c up">+6,8%</span></div><div class="a-lean"><i class="l" style="left:50%;width:22%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">PEPE</span><span class="c up">+3,9%</span></div><div class="a-lean"><i class="l" style="left:50%;width:14%"></i></div></div>
+            <div class="a-tile hot"><div class="r"><span class="s">ORDI</span><span class="c dn">−4,1%</span></div><div class="a-lean"><i class="s" style="left:21%;width:29%"></i></div></div>
+          </div>
+          <div class="a-rail">
+            <h4>Abiertas ahora</h4>
+            <div class="a-row"><div><div class="n">SOL <span class="a-chip l">L 5x</span></div><div class="m">$50 · hace 3 h</div></div><div class="p up">+$12,40<small>+4,1%</small></div></div>
+            <div class="a-row"><div><div class="n">ETH <span class="a-chip s">S 3x</span></div><div class="m">$50 · hace 1 h</div></div><div class="p dn">−$3,10<small>−0,9%</small></div></div>
+            <div class="a-row"><div><div class="n">AVAX <span class="a-chip l">L 2x</span></div><div class="m">$40 · hace 20 min</div></div><div class="p up">+$1,80<small>+1,2%</small></div></div>
+            <h4 style="margin-top:12px">Últimas decisiones</h4>
+            <div class="a-log"><time>14:32</time>Abrió long 5x en SOL. Tendencia en 1h y 4h a favor, funding negativo, volumen alto.</div>
+            <div class="a-log"><time>13:50</time>Cerró short en INJ con take profit: +$6,10.</div>
+            <div class="a-log"><time>13:05</time>Miró SUI y esperó: la inclinación es fuerte pero el RSI está sobrecomprado.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fp">
+        <div class="ap">
+          <div class="ap-status"><span>14:32</span><span>●●● ⌁</span></div>
+          <div class="ap-hero">
+            <div class="k">Balance · simulado</div>
+            <div class="v">$1.247,80</div>
+            <div class="ap-sub"><span class="up">+$38,20 hoy</span><span class="up">+24,8% total</span><span>14 de 23 ganados</span></div>
+          </div>
+          <div class="ap-prot">Faltan $452 para blindar los $1.000 iniciales<div class="a-bar"><i></i></div></div>
+          <div class="ap-board">
+            <div class="a-tile"><div class="r"><span class="s">BTC</span><span class="c up">+1,2%</span></div><div class="a-lean"><i class="l" style="left:50%;width:17.5%"></i></div></div>
+            <div class="a-tile pos-s"><div class="r"><span class="s">ETH</span><span class="a-chip s">S 3x</span></div><div class="a-lean"><i class="s" style="left:30%;width:20%"></i></div></div>
+            <div class="a-tile pos-l"><div class="r"><span class="s">SOL</span><span class="a-chip l">L 5x</span></div><div class="a-lean"><i class="l" style="left:50%;width:36%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">BNB</span><span class="c up">+0,4%</span></div><div class="a-lean"><i class="l" style="left:50%;width:5%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">XRP</span><span class="c dn">−1,5%</span></div><div class="a-lean"><i class="s" style="left:39%;width:11%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">DOGE</span><span class="c up">+2,3%</span></div><div class="a-lean"><i class="l" style="left:50%;width:9%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">ADA</span><span class="c dn">−0,6%</span></div><div class="a-lean"><i class="s" style="left:46%;width:4%"></i></div></div>
+            <div class="a-tile pos-l"><div class="r"><span class="s">AVAX</span><span class="a-chip l">L 2x</span></div><div class="a-lean"><i class="l" style="left:50%;width:27.5%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">LINK</span><span class="c up">+1,9%</span></div><div class="a-lean"><i class="l" style="left:50%;width:15%"></i></div></div>
+            <div class="a-tile hot"><div class="r"><span class="s">SUI</span><span class="c up">+5,2%</span></div><div class="a-lean"><i class="l" style="left:50%;width:30%"></i></div></div>
+            <div class="a-tile hot"><div class="r"><span class="s">INJ</span><span class="c dn">−3,0%</span></div><div class="a-lean"><i class="s" style="left:24%;width:26%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">NEAR</span><span class="c up">+3,4%</span></div><div class="a-lean"><i class="l" style="left:50%;width:24%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">APT</span><span class="c dn">−2,2%</span></div><div class="a-lean"><i class="s" style="left:27.5%;width:22.5%"></i></div></div>
+            <div class="a-tile"><div class="r"><span class="s">WIF</span><span class="c up">+6,8%</span></div><div class="a-lean"><i class="l" style="left:50%;width:22%"></i></div></div>
+            <div class="a-tile hot"><div class="r"><span class="s">ORDI</span><span class="c dn">−4,1%</span></div><div class="a-lean"><i class="s" style="left:21%;width:29%"></i></div></div>
+          </div>
+          <div class="ap-tabs"><b>Tablero</b><span>Posiciones</span><span>Monedas</span><span>Aprende</span><span>Ajustes</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ B · LIBRETA ============ -->
+  <div class="card" data-choice="libreta" onclick="toggleSelect(this)">
+    <div class="dir-head">
+      <div class="dir-letter">B</div>
+      <div>
+        <h3>Libreta</h3>
+        <p>El dashboard te habla en castellano: el titular es una frase con el número adentro ("Vas ganando $247,80 desde el 14 de octubre"), y las decisiones del bot se leen como un diario. Claro, una sola columna, sin ruido, igual en el celu que en desktop. Tipografía Instrument Sans.</p>
+      </div>
+    </div>
+    <div class="frames">
+      <div class="fd b">
+        <div class="b-top">
+          <div><b>Trading bot</b> · simulado</div>
+          <div class="nav"><b>Resumen</b><span>Posiciones</span><span>Monedas</span><span>Aprendizaje</span><span>Ajustes</span></div>
+        </div>
+        <div class="b-wrap">
+          <div class="b-hero">Vas ganando <em class="up">$247,80</em> desde el 14 de octubre.</div>
+          <div class="b-sub">Balance $1.247,80 · hoy <span class="up">+$38,20</span> · 14 de 23 trades ganados</div>
+          <div class="b-chart">
+            <svg viewBox="0 0 520 90" width="100%" height="72" preserveAspectRatio="none">
+              <defs><linearGradient id="gb" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#2E8B6A" stop-opacity=".22"/><stop offset="1" stop-color="#2E8B6A" stop-opacity="0"/></linearGradient></defs>
+              <path d="M0,74 C30,70 50,78 80,64 S130,52 160,58 S210,40 240,46 S290,30 320,38 S370,20 400,26 S460,10 520,8 L520,90 L0,90 Z" fill="url(#gb)"/>
+              <path d="M0,74 C30,70 50,78 80,64 S130,52 160,58 S210,40 240,46 S290,30 320,38 S370,20 400,26 S460,10 520,8" fill="none" stroke="#2E8B6A" stroke-width="2"/>
+            </svg>
+            <div class="lg"><span>14 oct</span><span>31 oct</span></div>
+          </div>
+          <div class="b-cols">
+            <div class="b-sec">
+              <h4>Abiertas ahora</h4>
+              <div class="b-rows">
+                <div class="b-row"><div class="b-coin"><b>SOL</b><span>hace 3 h · $50</span></div><span class="b-pill">Long 5x</span><div class="b-pnl up">+$12,40</div></div>
+                <div class="b-row"><div class="b-coin"><b>ETH</b><span>hace 1 h · $50</span></div><span class="b-pill s">Short 3x</span><div class="b-pnl dn">−$3,10</div></div>
+                <div class="b-row"><div class="b-coin"><b>AVAX</b><span>hace 20 min · $40</span></div><span class="b-pill">Long 2x</span><div class="b-pnl up">+$1,80</div></div>
+              </div>
+            </div>
+            <div class="b-sec">
+              <h4>Tu capital</h4>
+              <div class="b-cap">
+                <p>A <b>$452</b> de blindar los $1.000 iniciales.</p>
+                <div class="b-bar"><i></i></div>
+                <p class="m">Cuando la ganancia llegue a $700 (70%), el bot sigue sólo con lo ganado.</p>
+              </div>
+            </div>
+          </div>
+          <div class="b-journal">
+            <h4>Lo último que hizo</h4>
+            <p><time>14:32</time>Abrí un long 5x en SOL con $50. La tendencia en 1h y 4h acompaña y el funding está negativo.</p>
+            <p><time>13:50</time>Cerré el short en INJ en el take profit: +$6,10.</p>
+            <p><time>13:05</time>Miré SUI y esperé: la inclinación es fuerte pero el RSI está sobrecomprado.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="fp">
+        <div class="bp">
+          <div class="bp-status"><span>14:32</span><span>●●● ⌁</span></div>
+          <div class="bp-wrap">
+            <div class="b-hero">Vas ganando <em class="up">$247,80</em> desde el 14 de octubre.</div>
+            <div class="b-sub" style="font-size:10px">Balance $1.247,80 · hoy <span class="up">+$38,20</span></div>
+            <div class="b-chart">
+              <svg viewBox="0 0 520 90" width="100%" height="56" preserveAspectRatio="none">
+                <path d="M0,74 C30,70 50,78 80,64 S130,52 160,58 S210,40 240,46 S290,30 320,38 S370,20 400,26 S460,10 520,8 L520,90 L0,90 Z" fill="url(#gb)"/>
+                <path d="M0,74 C30,70 50,78 80,64 S130,52 160,58 S210,40 240,46 S290,30 320,38 S370,20 400,26 S460,10 520,8" fill="none" stroke="#2E8B6A" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="b-sec" style="margin-top:12px">
+              <h4>Abiertas ahora</h4>
+              <div class="b-rows">
+                <div class="b-row"><div class="b-coin"><b>SOL</b><span>3 h</span></div><span class="b-pill">Long 5x</span><div class="b-pnl up">+$12,40</div></div>
+                <div class="b-row"><div class="b-coin"><b>ETH</b><span>1 h</span></div><span class="b-pill s">Short 3x</span><div class="b-pnl dn">−$3,10</div></div>
+                <div class="b-row"><div class="b-coin"><b>AVAX</b><span>20 min</span></div><span class="b-pill">Long 2x</span><div class="b-pnl up">+$1,80</div></div>
+              </div>
+            </div>
+            <div class="b-sec" style="margin-top:12px">
+              <div class="b-cap"><p>A <b>$452</b> de blindar los $1.000 iniciales.</p><div class="b-bar"><i></i></div></div>
+            </div>
+            <div class="b-journal" style="margin-top:10px">
+              <p><time>14:32</time>Abrí un long 5x en SOL con $50. La tendencia en 1h y 4h acompaña.</p>
+            </div>
+          </div>
+          <div class="bp-tabs"><b>Resumen</b><span>Posiciones</span><span>Monedas</span><span>Aprende</span><span>Ajustes</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ C · CRISTAL ============ -->
+  <div class="card" data-choice="cristal" onclick="toggleSelect(this)">
+    <div class="dir-head">
+      <div class="dir-letter">C</div>
+      <div>
+        <h3>Cristal</h3>
+        <p>Materiales translúcidos sobre un fondo con profundidad, al estilo iOS: el balance vive en una placa de vidrio, cada posición es una tarjeta que se puede deslizar y la barra inferior deja pasar el contenido por detrás. Es la que más se presta a springs y gestos. Tipografía del sistema (SF en Apple).</p>
+      </div>
+    </div>
+    <div class="frames">
+      <div class="fd c">
+        <div class="c-top">
+          <div class="brand">Trading bot <span>simulado · en vivo</span></div>
+          <div class="c-seg"><b>Resumen</b><span>Posiciones</span><span>Monedas</span><span>Aprendizaje</span><span>Ajustes</span></div>
+        </div>
+        <div class="c-grid">
+          <div class="glass">
+            <div class="c-k">Balance</div>
+            <div class="c-big">$1.247,80</div>
+            <div class="c-meta"><span class="up">+$38,20 hoy</span><span class="up">+24,8% desde el inicio</span><span>14 de 23 ganados</span></div>
+            <svg viewBox="0 0 520 90" width="100%" height="64" preserveAspectRatio="none" style="margin-top:10px">
+              <defs><linearGradient id="gc" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#5EEAD4" stop-opacity=".35"/><stop offset="1" stop-color="#5EEAD4" stop-opacity="0"/></linearGradient></defs>
+              <path d="M0,74 C30,70 50,78 80,64 S130,52 160,58 S210,40 240,46 S290,30 320,38 S370,20 400,26 S460,10 520,8 L520,90 L0,90 Z" fill="url(#gc)"/>
+              <path d="M0,74 C30,70 50,78 80,64 S130,52 160,58 S210,40 240,46 S290,30 320,38 S370,20 400,26 S460,10 520,8" fill="none" stroke="#5EEAD4" stroke-width="2.2"/>
+            </svg>
+            <div class="c-prot">Faltan $452 para blindar los $1.000 iniciales<div class="bar"><i></i></div></div>
+          </div>
+          <div class="c-pos">
+            <div class="glass c-card"><div><div class="n">SOL <span class="c-pill l">Long 5x</span></div><div class="m">$50 · hace 3 h</div></div><div class="p up">+$12,40<small>+4,1%</small></div></div>
+            <div class="glass c-card"><div><div class="n">ETH <span class="c-pill s">Short 3x</span></div><div class="m">$50 · hace 1 h</div></div><div class="p dn">−$3,10<small>−0,9%</small></div></div>
+            <div class="glass c-card"><div><div class="n">AVAX <span class="c-pill l">Long 2x</span></div><div class="m">$40 · hace 20 min</div></div><div class="p up">+$1,80<small>+1,2%</small></div></div>
+          </div>
+        </div>
+        <div class="c-list">
+          <div class="glass c-item"><div><b>BTC</b><span class="ch up">+1,2%</span></div><span class="c-pill l">Mira long</span></div>
+          <div class="glass c-item"><div><b>SUI</b><span class="ch up">+5,2%</span></div><span class="c-pill l">Mira long</span></div>
+          <div class="glass c-item"><div><b>INJ</b><span class="ch dn">−3,0%</span></div><span class="c-pill s">Mira short</span></div>
+          <div class="glass c-item"><div><b>NEAR</b><span class="ch up">+3,4%</span></div><span class="c-pill l">Mira long</span></div>
+          <div class="glass c-item"><div><b>ORDI</b><span class="ch dn">−4,1%</span></div><span class="c-pill s">Mira short</span></div>
+          <div class="glass c-item"><div><b>BNB</b><span class="ch up">+0,4%</span></div><span class="c-pill n">Sin señal</span></div>
+        </div>
+      </div>
+
+      <div class="fp">
+        <div class="cp">
+          <div class="cp-status"><span>14:32</span><span>●●● ⌁</span></div>
+          <div class="cp-wrap">
+            <div class="glass">
+              <div class="c-k">Balance · simulado</div>
+              <div class="c-big">$1.247,80</div>
+              <div class="c-meta"><span class="up">+$38,20 hoy</span><span class="up">+24,8%</span></div>
+              <svg viewBox="0 0 520 90" width="100%" height="44" preserveAspectRatio="none" style="margin-top:8px">
+                <path d="M0,74 C30,70 50,78 80,64 S130,52 160,58 S210,40 240,46 S290,30 320,38 S370,20 400,26 S460,10 520,8 L520,90 L0,90 Z" fill="url(#gc)"/>
+                <path d="M0,74 C30,70 50,78 80,64 S130,52 160,58 S210,40 240,46 S290,30 320,38 S370,20 400,26 S460,10 520,8" fill="none" stroke="#5EEAD4" stroke-width="2.2"/>
+              </svg>
+              <div class="c-prot">Faltan $452 para blindar los $1.000<div class="bar"><i></i></div></div>
+            </div>
+            <div class="cp-h"><h4>Abiertas</h4><span>3 posiciones</span></div>
+            <div class="cp-scroll">
+              <div class="glass c-card"><div class="n">SOL <span class="c-pill l">Long 5x</span></div><div class="p up">+$12,40<small>+4,1% · hace 3 h</small></div></div>
+              <div class="glass c-card"><div class="n">ETH <span class="c-pill s">Short 3x</span></div><div class="p dn">−$3,10<small>−0,9% · hace 1 h</small></div></div>
+              <div class="glass c-card"><div class="n">AVAX <span class="c-pill l">Long 2x</span></div><div class="p up">+$1,80<small>+1,2%</small></div></div>
+            </div>
+            <div class="cp-h"><h4>Mirando</h4><span>30 monedas</span></div>
+            <div class="cp-list">
+              <div class="glass c-item"><div><b>SUI</b><span class="ch up">+5,2%</span></div><span class="c-pill l">Mira long</span></div>
+              <div class="glass c-item"><div><b>INJ</b><span class="ch dn">−3,0%</span></div><span class="c-pill s">Mira short</span></div>
+              <div class="glass c-item"><div><b>BTC</b><span class="ch up">+1,2%</span></div><span class="c-pill l">Mira long</span></div>
+            </div>
+          </div>
+          <div class="cp-tabs"><b>Resumen</b><span>Posiciones</span><span>Monedas</span><span>Aprende</span><span>Ajustes</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

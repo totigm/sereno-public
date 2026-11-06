@@ -1,0 +1,31 @@
+{
+  "name": "sereno",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Sereno: bot de futuros USDT-M con paper trading, replay histórico y dashboard.",
+  "type": "module",
+  "packageManager": "pnpm@12.3.4",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "vitest run",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "bot": "bash apps/bot/bin/sereno-bot.sh",
+    "db:generate": "pnpm --filter @sereno/db db:generate",
+    "db:migrate": "pnpm --filter @sereno/db db:migrate",
+    "db:seed-user": "pnpm --filter @sereno/web seed:user",
+    "demo": "pnpm --filter @sereno/web seed:demo",
+    "e2e": "pnpm --filter @sereno/web e2e"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "tsx": "^4.23.15",
+    "turbo": "^2.11.10",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.12"
+  }
+}

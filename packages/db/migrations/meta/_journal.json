@@ -1,0 +1,55 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1793493385707,
+      "tag": "0000_esquema_inicial",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793493397336,
+      "tag": "0001_market_snapshot_fillfactor",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793494891321,
+      "tag": "0002_bot_commands_payload_default",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793495956287,
+      "tag": "0003_learning_log_scope_and_single_active",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793504043258,
+      "tag": "0004_universe_days_excluded",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793515503992,
+      "tag": "0005_sessions_report",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793569641180,
+      "tag": "0006_plata_real",
+      "breakpoints": true
+    }
+  ]
+}

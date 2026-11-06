@@ -1,0 +1,30 @@
+# dependencies
+node_modules/
+
+# builds
+.next/
+dist/
+out/
+.turbo/
+coverage/
+
+# typescript / next (generados)
+next-env.d.ts
+*.tsbuildinfo
+
+# env
+.env
+.env.*
+!.env.example
+
+# brainstorm companion sessions
+.superpowers/
+.claude/worktrees/
+.worktrees/
+
+# misc
+.DS_Store
+*.log
+
+# local dev services
+.local/

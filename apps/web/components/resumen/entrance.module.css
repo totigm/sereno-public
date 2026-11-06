@@ -1,0 +1,35 @@
+/*
+  La secuencia de entrada de Resumen (spec §11.3): titular, curva, listas, de a 40 ms.
+  Es CSS para que corra desde el primer pintado, antes de hidratar; `--step` es el
+  lugar de cada bloque. Con movimiento reducido, todo aparece junto con un fundido.
+*/
+.item {
+  animation: rise 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--step, 0) * 40ms);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item {
+    animation: appear 200ms ease-out both;
+  }
+}

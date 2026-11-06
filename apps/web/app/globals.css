@@ -1,0 +1,188 @@
+@import 'tailwindcss';
+
+/* Tokens de la spec §11.2. El modo oscuro sigue al sistema con los mismos nombres. */
+:root {
+  --bg: #EDF0F4;
+  --surface: #FFFFFF;
+  --ink: #17202A;
+  --muted: #6B7482;
+  --line: #DFE3E8;
+  --gain: #2E8B6A;
+  --loss: #C4553D;
+  --gain-soft: #E1EEE8;
+  --loss-soft: #F5E5E1;
+  /* Velo detrás de las hojas: no es --ink, que en oscuro es casi blanco y aclararía la página. */
+  --scrim: rgba(23, 32, 42, 0.4);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0F1318;
+    --surface: #171C24;
+    --ink: #E8ECF1;
+    --muted: #8A93A3;
+    --line: #262D38;
+    --gain: #4FD1A5;
+    --loss: #FF7A7A;
+    --gain-soft: rgba(79,209,165,.14);
+    --loss-soft: rgba(255,122,122,.14);
+    --scrim: rgba(0, 0, 0, 0.6);
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  /* Sin paleta por defecto: todo color sale de los tokens. */
+  --color-*: initial;
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-gain: var(--gain);
+  --color-loss: var(--loss);
+  --color-gain-soft: var(--gain-soft);
+  --color-loss-soft: var(--loss-soft);
+  --color-scrim: var(--scrim);
+
+  --font-sans: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-panel: 14px;
+  --radius-control: 10px;
+  --radius-chip: 999px;
+
+  --breakpoint-desktop: 900px;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100dvh;
+    background-color: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    letter-spacing: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--ink) 16%, transparent);
+  }
+}
+
+/* Titular: numerales proporcionales, tracking −0,02em, altura de línea 1,2. */
+@utility headline {
+  font-size: 1.5rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+  text-wrap: pretty;
+}
+
+/* Panel: superficie, línea de 1px, radio 14, sin sombra. */
+@utility panel {
+  background-color: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-panel);
+}
+
+/* Respuesta al toque en pointer-down (spec §11.3). */
+@utility pressable {
+  transition: transform 100ms ease-out;
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &:active:not(:disabled) {
+      transform: none;
+    }
+  }
+}
+
+/* Barra translúcida con el contenido pasando por detrás; sólida con línea si se pide menos transparencia. */
+@utility material {
+  background-color: color-mix(in oklab, var(--surface) 78%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-top: 1px solid var(--line);
+  }
+}
+
+/*
+  La barra superior de desktop: del color del fondo, así en reposo se funde con la
+  página como en el mockup de la Libreta, y sólo se nota como material cuando el
+  contenido pasa por detrás. Sólida con línea abajo si se pide menos transparencia.
+*/
+@utility material-top {
+  background-color: color-mix(in oklab, var(--bg) 80%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--bg);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-bottom: 1px solid var(--line);
+  }
+}
+
+/*
+  Columnas del shell (spec §11.2): la de lectura mide 640px de contenido; la ancha
+  (tablero, barra superior) llega a 1200px. El margen lateral respeta el área segura
+  del celu en horizontal. Pantallas, bandas y esqueletos usan las mismas, así los
+  bordes coinciden.
+*/
+@utility column {
+  width: 100%;
+  max-width: calc(640px + 3rem);
+  margin-inline: auto;
+  padding-left: max(1.25rem, env(safe-area-inset-left));
+  padding-right: max(1.25rem, env(safe-area-inset-right));
+  @media (min-width: 900px) {
+    padding-inline: 1.5rem;
+  }
+}
+
+@utility column-wide {
+  width: 100%;
+  max-width: calc(1200px + 3rem);
+  margin-inline: auto;
+  padding-left: max(1.25rem, env(safe-area-inset-left));
+  padding-right: max(1.25rem, env(safe-area-inset-right));
+  @media (min-width: 900px) {
+    padding-inline: 1.5rem;
+  }
+}
+
+/*
+  Alto que ocupa la barra inferior (con el área segura), para que el final de cada
+  pantalla y los toasts queden por encima. Desde 900px no hay barra inferior.
+*/
+:root {
+  --shell-bottom: 0px;
+}
+
+:root:has([data-bottom-bar]) {
+  --shell-bottom: calc(3.5rem + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 900px) {
+  :root:has([data-bottom-bar]) {
+    --shell-bottom: 0px;
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "globalEnv": [
+    "DATABASE_URL",
+    "DATABASE_URL_UNPOOLED",
+    "BETTER_AUTH_SECRET",
+    "BETTER_AUTH_URL",
+    "ALLOWED_EMAILS",
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET",
+    "DASHBOARD_PASSWORD",
+    "LOG_LEVEL",
+    "BINANCE_API_KEY",
+    "BINANCE_API_SECRET"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "dist/**"
+      ]
+    },
+    "test": {
+      "dependsOn": [
+        "^test"
+      ],
+      "env": [
+        "DATABASE_URL_TEST",
+        "DATABASE_URL_TEST_BOT",
+        "DATABASE_URL_TEST_WEB"
+      ],
+      "outputs": [
+        "coverage/**"
+      ]
+    },
+    "lint": {
+      "dependsOn": [
+        "^lint"
+      ]
+    },
+    "typecheck": {
+      "dependsOn": [
+        "^typecheck"
+      ],
+      "outputs": []
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

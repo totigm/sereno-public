@@ -1,0 +1,15 @@
+# Contexto de `docker build -f apps/bot/Dockerfile .`: fuera todo lo que la imagen no usa,
+# los secretos y lo pesado (los worktrees de `.claude` viven dentro del repo).
+**/node_modules
+**/.next
+**/.turbo
+**/dist
+**/coverage
+**/*.tsbuildinfo
+.local
+.env*
+**/.env*
+.superpowers
+.claude
+.worktrees
+.git

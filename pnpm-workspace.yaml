@@ -1,0 +1,13 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+autoInstallPeers: true
+strictPeerDependencies: false
+
+# pnpm ≥ 10 no corre scripts de instalación salvo que se los apruebe acá
+# (`pnpm approve-builds <pkg>`). esbuild sólo verifica su binario en el postinstall.
+allowBuilds:
+  esbuild: true
+minimumReleaseAgeExclude:
+  - ws@8.22.1
